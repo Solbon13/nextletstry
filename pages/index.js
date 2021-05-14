@@ -45,16 +45,33 @@ const PostTitle = styled.div`
   border-radius: 0px 0px 15px 15px;
 `
 
-export default function Home() {
+export default function Home({posts}) {
+
+  if (!posts) 'Loading...'
+
   return (
     <div>
       <Head>
-        <title>Create Next App</title>
+        <title>Статьи</title>
       </Head>
       <Navbar />
       <Wrapper>
         <div className="container">
           <PostsWrapper>
+            {
+              posts.map((post, idx) => {
+                return (
+                  <Link href={'/post/[id]'} as={`/post/${post._id}`} key={idx}>
+                    <Post bgImage={post.imgUrl}>
+                      <PostTitle>
+                        {post.title}
+                      </PostTitle>
+                    </Post>
+                  </Link>
+                )
+              })
+            }
+
             <Link href={'/post/[id]'} as={`/post/test`}>
               <Post bgImage={'./static/images/1.jpg'}>
                 <PostTitle>
@@ -97,4 +114,25 @@ export default function Home() {
 
     </div>
   )
+}
+
+export async function getServerSideProps(context) {
+  // const res = await fetch(`https://...`)
+  // const posts = await res.json()
+
+  const posts = [
+    {_id: 1, title: 'test title', text: 'text state', imgUrl: './static/images/5.jpg'}
+  ]
+
+  if (!posts) {
+    return {
+      notFound: true,
+    }
+  }
+
+  return {
+    props: {
+      posts
+    }, // will be passed to the page component as props
+  }
 }
